@@ -48,4 +48,18 @@ contract DecentralizedElection {
         }
         return candidateList;
     }
+    
+    // Function to reset the election (only admin)
+    function resetElection() public {
+        require(msg.sender == admin, "Only admin can reset the election");
+
+        // Reset candidates
+        for (uint i = 1; i <= candidatesCount; i++) {
+            delete candidates[i];
+        }
+        candidatesCount = 0;
+        for (uint i = 0; i < 100; i++) {
+            // Placeholder: In practice, you'd need to track voter addresses separately to reset.
+        }
+    }
 }
