@@ -62,4 +62,12 @@ contract DecentralizedElection {
             // Placeholder: In practice, you'd need to track voter addresses separately to reset.
         }
     }
+
+    // Function to change the admin (only current admin)
+    function changeAdmin(address _newAdmin) public {
+        require(msg.sender == admin, "Only current admin can change admin");
+        require(_newAdmin != address(0), "Invalid address for new admin");
+        admin = _newAdmin;
+    }
+
 }
