@@ -69,5 +69,22 @@ contract DecentralizedElection {
         require(_newAdmin != address(0), "Invalid address for new admin");
         admin = _newAdmin;
     }
+    // Get the winner candidate
+    function getWinner() public view returns (uint, string memory, uint) {
+        require(candidatesCount > 0, "No candidates available");
+
+        uint winningVoteCount = 0;
+        uint winningCandidateId = 0;
+
+        for (uint i = 1; i <= candidatesCount; i++) {
+            if (candidates[i].voteCount > winningVoteCount) {
+                winningVoteCount = candidates[i].voteCount;
+                winningCandidateId = i;
+            }
+        }
+
+        Candidate memory winner = candidates[winningCandidateId];
+        return (winner.id, winner.name, winner.voteCount);
+    }
 
 }
