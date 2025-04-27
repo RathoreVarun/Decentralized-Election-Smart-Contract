@@ -86,5 +86,11 @@ contract DecentralizedElection {
         Candidate memory winner = candidates[winningCandidateId];
         return (winner.id, winner.name, winner.voteCount);
     }
+    // NEW FUNCTION: Get details of a single candidate by ID
+    function getCandidate(uint _candidateId) public view returns (uint, string memory, uint) {
+        require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID");
+        Candidate memory candidate = candidates[_candidateId];
+        return (candidate.id, candidate.name, candidate.voteCount);
+    }
 
 }
