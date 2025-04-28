@@ -92,5 +92,13 @@ contract DecentralizedElection {
         Candidate memory candidate = candidates[_candidateId];
         return (candidate.id, candidate.name, candidate.voteCount);
     }
-
+    // Get total votes cast in the election
+    function getTotalVotes() public view returns (uint) {
+        uint totalVotes = 0;
+        for (uint i = 1; i <= candidatesCount; i++) {
+            totalVotes += candidates[i].voteCount;
+        }
+        return totalVotes;
+    }
+ 
 }
