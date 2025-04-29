@@ -100,5 +100,13 @@ contract DecentralizedElection {
         }
         return totalVotes;
     }
- 
+    // Get the percentage of total votes a candidate has received
+    function getVotePercentage(uint _candidateId) public view returns (uint) {
+        require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate");
+        uint totalVotesCast = getTotalVotes();
+        if (totalVotesCast == 0) {
+            return 0;
+        }
+        return (candidates[_candidateId].voteCount * 100) / totalVotesCast;
+    }
 }
