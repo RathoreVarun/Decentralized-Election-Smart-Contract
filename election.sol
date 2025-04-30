@@ -109,4 +109,8 @@ contract DecentralizedElection {
         }
         return (candidates[_candidateId].voteCount * 100) / totalVotesCast;
     }
+    // function to check candidate existence
+    function candidateExists(uint _candidateId) public view returns (bool) {
+        return (_candidateId > 0 && _candidateId <= candidatesCount);
+    }
 }
