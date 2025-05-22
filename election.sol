@@ -113,6 +113,10 @@ contract DecentralizedElection {
     function candidateExists(uint _candidateId) public view returns (bool) {
         return (_candidateId > 0 && _candidateId <= candidatesCount);
     }
+    // Function to check if a specific address has voted
+    function hasAddressVoted(address _voter) public view returns (bool) {
+        return hasVoted[_voter];
+    }
     // Function to update a candidate's name (only admin)
     function updateCandidateName(uint _candidateId, string memory _newName) public {
         require(msg.sender == admin, "Only admin can update candidate name");
