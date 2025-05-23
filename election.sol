@@ -123,4 +123,12 @@ contract DecentralizedElection {
         require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID");
         candidates[_candidateId].name = _newName;
     }
+    // Get list of all candidate names
+    function getCandidateNames() public view returns (string[] memory) {
+        string[] memory names = new string[](candidatesCount);
+        for (uint i = 1; i <= candidatesCount; i++) {
+            names[i - 1] = candidates[i].name;
+        }
+        return names;
+    }
 }
