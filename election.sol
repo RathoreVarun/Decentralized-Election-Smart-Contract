@@ -69,6 +69,7 @@ contract DecentralizedElection {
         require(_newAdmin != address(0), "Invalid address for new admin");
         admin = _newAdmin;
     }
+
     // Get the winner candidate
     function getWinner() public view returns (uint, string memory, uint) {
         require(candidatesCount > 0, "No candidates available");
@@ -86,12 +87,14 @@ contract DecentralizedElection {
         Candidate memory winner = candidates[winningCandidateId];
         return (winner.id, winner.name, winner.voteCount);
     }
-    // NEW FUNCTION: Get details of a single candidate by ID
+
+    // Get details of a single candidate by ID
     function getCandidate(uint _candidateId) public view returns (uint, string memory, uint) {
         require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID");
         Candidate memory candidate = candidates[_candidateId];
         return (candidate.id, candidate.name, candidate.voteCount);
     }
+
     // Get total votes cast in the election
     function getTotalVotes() public view returns (uint) {
         uint totalVotes = 0;
@@ -100,6 +103,7 @@ contract DecentralizedElection {
         }
         return totalVotes;
     }
+
     // Get the percentage of total votes a candidate has received
     function getVotePercentage(uint _candidateId) public view returns (uint) {
         require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate");
@@ -109,20 +113,29 @@ contract DecentralizedElection {
         }
         return (candidates[_candidateId].voteCount * 100) / totalVotesCast;
     }
-    // function to check candidate existence
+
+    // Function to check candidate existence
     function candidateExists(uint _candidateId) public view returns (bool) {
         return (_candidateId > 0 && _candidateId <= candidatesCount);
     }
+
     // Function to check if a specific address has voted
     function hasAddressVoted(address _voter) public view returns (bool) {
         return hasVoted[_voter];
     }
+
+    // NEW FUNCTION: Get voting status of the caller
+    function getMyVotingStatus() public view returns (bool) {
+        return hasVoted[msg.sender];
+    }
+
     // Function to update a candidate's name (only admin)
     function updateCandidateName(uint _candidateId, string memory _newName) public {
         require(msg.sender == admin, "Only admin can update candidate name");
         require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID");
         candidates[_candidateId].name = _newName;
     }
+
     // Get list of all candidate names
     function getCandidateNames() public view returns (string[] memory) {
         string[] memory names = new string[](candidatesCount);
