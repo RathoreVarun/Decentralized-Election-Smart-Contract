@@ -124,7 +124,7 @@ contract DecentralizedElection {
         return hasVoted[_voter];
     }
 
-    // NEW FUNCTION: Get voting status of the caller
+    // Get voting status of the caller
     function getMyVotingStatus() public view returns (bool) {
         return hasVoted[msg.sender];
     }
@@ -144,4 +144,25 @@ contract DecentralizedElection {
         }
         return names;
     }
+
+    // Get the candidate with the second highest votes
+    function getRunnerUp() public view returns (uint, string memory, uint) {
+        require(candidatesCount > 1, "Not enough candidates to determine runner-up");
+
+        uint highest = 0;
+        uint secondHighest = 0;
+
+        for (uint i = 1; i <= candidatesCount; i++) {
+            uint votes = candidates[i].voteCount;
+            if (votes > candidates[highest].voteCount) {
+                secondHighest = highest;
+                highest = i;
+            } else if (votes > candidates[secondHighest].voteCount && i != highest) {
+                secondHighest = i;
+            }
+        }
+        Candidate memory runnerUp = candidates[secondHighest];
+        return (runnerUp.id, runnerUp.name, runnerUp.voteCount);
+    }
+
 }
