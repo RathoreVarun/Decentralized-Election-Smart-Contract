@@ -165,4 +165,33 @@ contract DecentralizedElection {
         return (runnerUp.id, runnerUp.name, runnerUp.voteCount);
     }
 
+    // Get top N candidates based on vote count
+    function getTopNCandidates(uint n) public view returns (Candidate[] memory) {
+        require(n > 0 && n <= candidatesCount, "Invalid number of candidates requested");
+
+        Candidate[] memory all = new Candidate[](candidatesCount);
+        for (uint i = 0; i < candidatesCount; i++) {
+            all[i] = candidates[i + 1];
+        }
+
+        // Sort candidates by vote count using simple bubble sort (not gas efficient, for demo only)
+        for (uint i = 0; i < candidatesCount - 1; i++) {
+            for (uint j = 0; j < candidatesCount - i - 1; j++) {
+                if (all[j].voteCount < all[j + 1].voteCount) {
+                    Candidate memory temp = all[j];
+                    all[j] = all[j + 1];
+                    all[j + 1] = temp;
+                }
+            }
+        }
+
+        Candidate[] memory top = new Candidate[](n);
+        for (uint i = 0; i < n; i++) {
+            top[i] = all[i];
+        }
+
+        return top;
+    }
+
+
 }
