@@ -192,6 +192,14 @@ contract DecentralizedElection {
 
         return top;
     }
+    // Get voting status of a list of addresses
+    function getVoterList(address[] memory _addresses) public view returns (bool[] memory) {
+        bool[] memory statuses = new bool[](_addresses.length);
+        for (uint i = 0; i < _addresses.length; i++) {
+            statuses[i] = hasVoted[_addresses[i]];
+        }
+        return statuses;
+    }
 
 
 }
