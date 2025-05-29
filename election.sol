@@ -200,6 +200,27 @@ contract DecentralizedElection {
         }
         return statuses;
     }
+     // Get list of candidates with zero votes
+    function getCandidatesWithZeroVotes() public view returns (Candidate[] memory) {
+        // First count how many have zero votes
+        uint zeroCount = 0;
+        for (uint i = 1; i <= candidatesCount; i++) {
+            if (candidates[i].voteCount == 0) {
+                zeroCount++;
+            }
+        }
 
+        // Create an array for them
+        Candidate[] memory zeroVoteCandidates = new Candidate[](zeroCount);
+        uint index = 0;
+        for (uint i = 1; i <= candidatesCount; i++) {
+            if (candidates[i].voteCount == 0) {
+                zeroVoteCandidates[index] = candidates[i];
+                index++;
+            }
+        }
+
+        return zeroVoteCandidates;
+    }
 
 }
