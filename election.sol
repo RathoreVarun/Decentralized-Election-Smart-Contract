@@ -169,29 +169,27 @@ contract DecentralizedElection {
     function getTopNCandidates(uint n) public view returns (Candidate[] memory) {
         require(n > 0 && n <= candidatesCount, "Invalid number of candidates requested");
 
+        // Copy candidates into a memory array
         Candidate[] memory all = new Candidate[](candidatesCount);
         for (uint i = 0; i < candidatesCount; i++) {
             all[i] = candidates[i + 1];
         }
-
-        // Sort candidates by vote count using simple bubble sort (not gas efficient, for demo only)
-        for (uint i = 0; i < candidatesCount - 1; i++) {
+        // Simple bubble sort (descending order by voteCount)
+        for (uint i = 0; i < candidatesCount; i++) {
             for (uint j = 0; j < candidatesCount - i - 1; j++) {
                 if (all[j].voteCount < all[j + 1].voteCount) {
-                    Candidate memory temp = all[j];
-                    all[j] = all[j + 1];
-                    all[j + 1] = temp;
+                    (all[j], all[j + 1]) = (all[j + 1], all[j]); // Swap
                 }
             }
         }
-
+        // Prepare top N candidates
         Candidate[] memory top = new Candidate[](n);
         for (uint i = 0; i < n; i++) {
             top[i] = all[i];
         }
-
         return top;
     }
+
     // Get voting status of a list of addresses
     function getVoterList(address[] memory _addresses) public view returns (bool[] memory) {
         bool[] memory statuses = new bool[](_addresses.length);
