@@ -149,19 +149,27 @@ contract DecentralizedElection {
     function getRunnerUp() public view returns (uint, string memory, uint) {
         require(candidatesCount > 1, "Not enough candidates to determine runner-up");
 
-        uint highest = 0;
-        uint secondHighest = 0;
+        uint highestId = 0;
+        uint secondHighestId = 0;
+        uint highestVotes = 0;
+        uint secondHighestVotes = 0;
 
         for (uint i = 1; i <= candidatesCount; i++) {
             uint votes = candidates[i].voteCount;
-            if (votes > candidates[highest].voteCount) {
-                secondHighest = highest;
-                highest = i;
-            } else if (votes > candidates[secondHighest].voteCount && i != highest) {
-                secondHighest = i;
+            if (votes > highestVotes) {
+                secondHighestVotes = highestVotes;
+                secondHighestId = highestId;
+                highestVotes = votes;
+                highestId = i;
+            } else if (votes > secondHighestVotes && i != highestId) {
+                secondHighestVotes = votes;
+                secondHighestId = i;
             }
         }
-        Candidate memory runnerUp = candidates[secondHighest];
+
+        require(secondHighestId != 0, "No valid runner-up found");
+
+        Candidate memory runnerUp = candidates[secondHighestId];
         return (runnerUp.id, runnerUp.name, runnerUp.voteCount);
     }
 
