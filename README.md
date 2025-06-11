@@ -6,7 +6,7 @@
 ## 📖 Project Description
 This smart contract enables a transparent, secure, and tamper-proof voting system on the Ethereum blockchain. It ensures that each voter can cast one vote only and that all votes are publicly verifiable.
 
-## 🌟 Project Vision
+## 🌟 Project Vision 
 To build a decentralized voting platform that removes the need for centralized authorities, eliminates election fraud, and increases trust and transparency in the democratic process.
 
 ## 🚀 Key Features
