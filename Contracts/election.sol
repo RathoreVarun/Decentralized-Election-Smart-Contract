@@ -183,23 +183,29 @@ contract DecentralizedElection {
 
     // ----------- Voter Functions -----------
 
-    function hasAddressVoted(address _addr) public view returns (bool) {
-        return hasVoted[_addr];
+    // Checks if the provided address has voted
+    function hasAddressVoted(address _voter) public view returns (bool) {
+        return hasVoted[_voter];
     }
 
-    function getMyVotingStatus() public view returns (bool) {
+    // Checks if the sender has voted
+    function hasSenderVoted() public view returns (bool) {
         return hasVoted[msg.sender];
     }
 
-    function getVoterList(address[] memory _addresses) public view returns (bool[] memory) {
-        bool[] memory result = new bool[](_addresses.length);
-        for (uint i = 0; i < _addresses.length; i++) {
-            result[i] = hasVoted[_addresses[i]];
+    // Returns the voting status (true/false) for a list of addresses
+    function getVotingStatuses(address[] calldata _voters) external view returns (bool[] memory) {
+        uint len = _voters.length;
+        bool[] memory statuses = new bool[](len);
+        for (uint i = 0; i < len; i++) {
+            statuses[i] = hasVoted[_voters[i]];
         }
-        return result;
+        return statuses;
     }
 
-    function candidateExists(uint _id) public view returns (bool) {
-        return (_id > 0 && _id <= candidatesCount);
+    // Validates if a candidate with given ID exists
+    function isCandidateValid(uint _candidateId) public view returns (bool) {
+        return _candidateId != 0 && _candidateId <= candidatesCount;
     }
+
 }
