@@ -166,20 +166,32 @@ contract DecentralizedElection {
     }
 
     function getCandidatesWithZeroVotes() public view returns (Candidate[] memory) {
+    // Temporary array to store candidates with zero votes (max possible size is candidatesCount)
+        Candidate[] memory temp = new Candidate[](candidatesCount);
         uint count = 0;
-        for (uint i = 1; i <= candidatesCount; i++) {
-            if (candidates[i].voteCount == 0) count++;
-        }
 
-        Candidate[] memory zeroCandidates = new Candidate[](count);
-        uint index = 0;
+        // Loop through all candidates
         for (uint i = 1; i <= candidatesCount; i++) {
-            if (candidates[i].voteCount == 0) {
-                zeroCandidates[index++] = candidates[i];
+            Candidate memory candidate = candidates[i];
+            // Check if the candidate has zero votes
+            if (candidate.voteCount == 0) {
+                // Store in the temp array and increment count
+                temp[count++] = candidate;
             }
         }
+
+        // Create a fixed-size array based on the actual number of zero-vote candidates
+        Candidate[] memory zeroCandidates = new Candidate[](count);
+
+        // Copy the relevant candidates from temp to the final result array
+        for (uint i = 0; i < count; i++) {
+            zeroCandidates[i] = temp[i];
+        }
+
+        // Return the array of candidates with zero votes
         return zeroCandidates;
     }
+
 
     // ----------- Voter Functions -----------
 
