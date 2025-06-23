@@ -166,46 +166,68 @@ contract DecentralizedElection {
     }
 
     function getCandidatesWithZeroVotes() public view returns (Candidate[] memory) {
-    // Temporary array to store candidates with zero votes (max possible size is candidatesCount)
         Candidate[] memory temp = new Candidate[](candidatesCount);
         uint count = 0;
 
-        // Loop through all candidates
         for (uint i = 1; i <= candidatesCount; i++) {
             Candidate memory candidate = candidates[i];
-            // Check if the candidate has zero votes
             if (candidate.voteCount == 0) {
-                // Store in the temp array and increment count
                 temp[count++] = candidate;
             }
         }
 
-        // Create a fixed-size array based on the actual number of zero-vote candidates
         Candidate[] memory zeroCandidates = new Candidate[](count);
-
-        // Copy the relevant candidates from temp to the final result array
         for (uint i = 0; i < count; i++) {
             zeroCandidates[i] = temp[i];
         }
 
-        // Return the array of candidates with zero votes
         return zeroCandidates;
     }
 
+    // ----------- New Function: Get Leading Candidates (in case of tie) -----------
+
+    function getLeadingCandidates() public view returns (Candidate[] memory) {
+        require(candidatesCount > 0, "No candidates");
+
+        uint maxVotes = 0;
+        uint count = 0;
+
+        // Find max vote count
+        for (uint i = 1; i <= candidatesCount; i++) {
+            if (candidates[i].voteCount > maxVotes) {
+                maxVotes = candidates[i].voteCount;
+            }
+        }
+
+        // Count candidates with max votes
+        for (uint i = 1; i <= candidatesCount; i++) {
+            if (candidates[i].voteCount == maxVotes) {
+                count++;
+            }
+        }
+
+        // Prepare array of leading candidates
+        Candidate[] memory leaders = new Candidate[](count);
+        uint index = 0;
+        for (uint i = 1; i <= candidatesCount; i++) {
+            if (candidates[i].voteCount == maxVotes) {
+                leaders[index++] = candidates[i];
+            }
+        }
+
+        return leaders;
+    }
 
     // ----------- Voter Functions -----------
 
-    // Checks if the provided address has voted
     function hasAddressVoted(address _voter) public view returns (bool) {
         return hasVoted[_voter];
     }
 
-    // Checks if the sender has voted
     function hasSenderVoted() public view returns (bool) {
         return hasVoted[msg.sender];
     }
 
-    // Returns the voting status (true/false) for a list of addresses
     function getVotingStatuses(address[] calldata _voters) external view returns (bool[] memory) {
         uint len = _voters.length;
         bool[] memory statuses = new bool[](len);
@@ -215,9 +237,7 @@ contract DecentralizedElection {
         return statuses;
     }
 
-    // Validates if a candidate with given ID exists
     function isCandidateValid(uint _candidateId) public view returns (bool) {
         return _candidateId != 0 && _candidateId <= candidatesCount;
     }
-
 }
