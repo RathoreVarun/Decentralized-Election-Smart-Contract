@@ -94,6 +94,12 @@ contract DecentralizedElection {
         }
     }
 
+    function getAverageVotes() public view returns (uint) {
+        if (candidatesCount == 0) return 0;
+        uint total = getTotalVotes();
+        return total / candidatesCount;
+    }
+
     function getVotes(uint _id) public view validCandidate(_id) returns (uint) {
         return candidates[_id].voteCount;
     }
@@ -185,36 +191,35 @@ contract DecentralizedElection {
     }
 
     function getLeadingCandidates() public view returns (Candidate[] memory) {
-    require(candidatesCount > 0, "No candidates");
+        require(candidatesCount > 0, "No candidates");
 
-    uint maxVotes = 0;
-    uint count = 0;
+        uint maxVotes = 0;
+        uint count = 0;
 
-    // First pass: determine maxVotes and count how many candidates have that vote
-    for (uint i = 1; i <= candidatesCount; i++) {
-        uint votes = candidates[i].voteCount;
-        if (votes > maxVotes) {
-            maxVotes = votes;
-            count = 1; // reset count
-        } else if (votes == maxVotes) {
-            count++;
+        // First pass: determine maxVotes and count how many candidates have that vote
+        for (uint i = 1; i <= candidatesCount; i++) {
+            uint votes = candidates[i].voteCount;
+            if (votes > maxVotes) {
+                maxVotes = votes;
+                count = 1; // reset count
+            } else if (votes == maxVotes) {
+                count++;
+            }
         }
-    }
 
-    // Second pass: collect candidates with maxVotes
-    Candidate[] memory leaders = new Candidate[](count);
-    uint index = 0;
+        // Second pass: collect candidates with maxVotes
+        Candidate[] memory leaders = new Candidate[](count);
+        uint index = 0;
 
-    for (uint i = 1; i <= candidatesCount; i++) {
-        if (candidates[i].voteCount == maxVotes) {
-            leaders[index] = candidates[i];
-            index++;
+        for (uint i = 1; i <= candidatesCount; i++) {
+            if (candidates[i].voteCount == maxVotes) {
+                leaders[index] = candidates[i];
+                index++;
+            }
         }
+
+        return leaders;
     }
-
-    return leaders;
-}
-
 
     // ----------- Voter Functions -----------
 
