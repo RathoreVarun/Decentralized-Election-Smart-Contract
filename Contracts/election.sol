@@ -13,6 +13,7 @@ contract DecentralizedElection {
     uint public candidatesCount;
     mapping(uint => Candidate) private candidates;
     mapping(address => bool) private hasVoted;
+    address[] private voterList; // NEW: Track voters who voted
 
     // ----------- Modifiers -----------
     modifier onlyAdmin() {
@@ -55,7 +56,11 @@ contract DecentralizedElection {
             delete candidates[i];
         }
         candidatesCount = 0;
-        // Note: hasVoted reset is not possible unless you maintain a list of voter addresses.
+
+        for (uint i = 0; i < voterList.length; i++) {
+            hasVoted[voterList[i]] = false;
+        }
+        delete voterList;
     }
 
     // ----------- Voting Functions -----------
@@ -63,6 +68,7 @@ contract DecentralizedElection {
     function vote(uint _id) public notVoted validCandidate(_id) {
         hasVoted[msg.sender] = true;
         candidates[_id].voteCount++;
+        voterList.push(msg.sender); // Track voter
     }
 
     // ----------- View Functions -----------
@@ -155,7 +161,7 @@ contract DecentralizedElection {
             temp[i] = candidates[i + 1];
         }
 
-        // Bubble sort for demo purposes (inefficient for large data)
+        // Bubble sort (inefficient, use only for small N)
         for (uint i = 0; i < candidatesCount; i++) {
             for (uint j = 0; j < candidatesCount - i - 1; j++) {
                 if (temp[j].voteCount < temp[j + 1].voteCount) {
@@ -196,25 +202,23 @@ contract DecentralizedElection {
         uint maxVotes = 0;
         uint count = 0;
 
-        // First pass: determine maxVotes and count how many candidates have that vote
+        // First pass: get maxVotes and count leaders
         for (uint i = 1; i <= candidatesCount; i++) {
             uint votes = candidates[i].voteCount;
             if (votes > maxVotes) {
                 maxVotes = votes;
-                count = 1; // reset count
+                count = 1;
             } else if (votes == maxVotes) {
                 count++;
             }
         }
 
-        // Second pass: collect candidates with maxVotes
+        // Second pass: gather all leading candidates
         Candidate[] memory leaders = new Candidate[](count);
         uint index = 0;
-
         for (uint i = 1; i <= candidatesCount; i++) {
             if (candidates[i].voteCount == maxVotes) {
-                leaders[index] = candidates[i];
-                index++;
+                leaders[index++] = candidates[i];
             }
         }
 
@@ -238,6 +242,10 @@ contract DecentralizedElection {
             statuses[i] = hasVoted[_voters[i]];
         }
         return statuses;
+    }
+
+    function getAllVoters() public view returns (address[] memory) {
+        return voterList;
     }
 
     function isCandidateValid(uint _candidateId) public view returns (bool) {
