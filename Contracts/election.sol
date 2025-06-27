@@ -13,7 +13,9 @@ contract DecentralizedElection {
     uint public candidatesCount;
     mapping(uint => Candidate) private candidates;
     mapping(address => bool) private hasVoted;
-    address[] private voterList; // NEW: Track voters who voted
+    address[] private voterList;
+
+    bool public electionActive = true; // NEW: Election status flag
 
     // ----------- Modifiers -----------
     modifier onlyAdmin() {
@@ -28,6 +30,11 @@ contract DecentralizedElection {
 
     modifier notVoted() {
         require(!hasVoted[msg.sender], "Already voted");
+        _;
+    }
+
+    modifier electionOngoing() {
+        require(electionActive, "Election is not active");
         _;
     }
 
@@ -61,14 +68,24 @@ contract DecentralizedElection {
             hasVoted[voterList[i]] = false;
         }
         delete voterList;
+
+        electionActive = true; // Reset election status
+    }
+
+    function startElection() public onlyAdmin {
+        electionActive = true;
+    }
+
+    function endElection() public onlyAdmin {
+        electionActive = false;
     }
 
     // ----------- Voting Functions -----------
 
-    function vote(uint _id) public notVoted validCandidate(_id) {
+    function vote(uint _id) public notVoted validCandidate(_id) electionOngoing {
         hasVoted[msg.sender] = true;
         candidates[_id].voteCount++;
-        voterList.push(msg.sender); // Track voter
+        voterList.push(msg.sender);
     }
 
     // ----------- View Functions -----------
@@ -161,7 +178,6 @@ contract DecentralizedElection {
             temp[i] = candidates[i + 1];
         }
 
-        // Bubble sort (inefficient, use only for small N)
         for (uint i = 0; i < candidatesCount; i++) {
             for (uint j = 0; j < candidatesCount - i - 1; j++) {
                 if (temp[j].voteCount < temp[j + 1].voteCount) {
@@ -202,7 +218,6 @@ contract DecentralizedElection {
         uint maxVotes = 0;
         uint count = 0;
 
-        // First pass: get maxVotes and count leaders
         for (uint i = 1; i <= candidatesCount; i++) {
             uint votes = candidates[i].voteCount;
             if (votes > maxVotes) {
@@ -213,7 +228,6 @@ contract DecentralizedElection {
             }
         }
 
-        // Second pass: gather all leading candidates
         Candidate[] memory leaders = new Candidate[](count);
         uint index = 0;
         for (uint i = 1; i <= candidatesCount; i++) {
