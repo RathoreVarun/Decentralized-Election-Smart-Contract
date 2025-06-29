@@ -15,7 +15,7 @@ contract DecentralizedElection {
     mapping(address => bool) private hasVoted;
     address[] private voterList;
 
-    bool public electionActive = true; // NEW: Election status flag
+    bool public electionActive = true; // Election status flag
 
     // ----------- Modifiers -----------
     modifier onlyAdmin() {
@@ -264,5 +264,11 @@ contract DecentralizedElection {
 
     function isCandidateValid(uint _candidateId) public view returns (bool) {
         return _candidateId != 0 && _candidateId <= candidatesCount;
+    }
+
+    // ----------- Current status of the election  -----------
+
+    function getElectionStatus() public view returns (bool) {
+        return electionActive;
     }
 }
