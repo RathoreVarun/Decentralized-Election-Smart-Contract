@@ -1,60 +1,56 @@
 const hre = require("hardhat");
+const fs = require("fs");
 
 async function main() {
   console.log("Starting deployment on Core Testnet 2...");
-  
+
   // Get the deployer account
   const [deployer] = await hre.ethers.getSigners();
-  
+
   console.log("Deploying contracts with the account:", deployer.address);
   console.log("Account balance:", (await deployer.getBalance()).toString());
-  
-  // Election name for the contract
-  const electionName = "Decentralized Presidential Election 2024";
-  
+
   // Get the contract factory
-  const Project = await hre.ethers.getContractFactory("Project");
-  
-  console.log("Deploying Decentralized Election Smart Contract...");
-  
-  // Deploy the contract
-  const project = await Project.deploy(electionName);
-  
-  // Wait for the contract to be deployed
-  await project.deployed();
-  
+  const Election = await hre.ethers.getContractFactory("DecentralizedElection");
+
+  console.log("Deploying DecentralizedElection contract...");
+
+  // Deploy the contract without constructor arguments
+  const election = await Election.deploy();
+
+  // Wait for deployment
+  await election.deployed();
+
   console.log("✅ Contract deployed successfully!");
-  console.log("Contract address:", project.address);
-  console.log("Election name:", electionName);
-  console.log("Deployer (Owner):", deployer.address);
-  console.log("Transaction hash:", project.deployTransaction.hash);
-  
-  // Wait for a few block confirmations
-  console.log("Waiting for block confirmations...");
-  await project.deployTransaction.wait(2);
-  
+  console.log("Contract address:", election.address);
+  console.log("Deployer (Admin):", deployer.address);
+  console.log("Transaction hash:", election.deployTransaction.hash);
+
+  // Wait for block confirmations
+  console.log("Waiting for 2 block confirmations...");
+  await election.deployTransaction.wait(2);
+
   console.log("✅ Contract confirmed on blockchain!");
-  
-  // Display deployment summary
+
+  // Deployment Summary
   console.log("\n" + "=".repeat(60));
   console.log("DEPLOYMENT SUMMARY");
   console.log("=".repeat(60));
-  console.log(`Contract Name: Decentralized Election Smart Contract`);
-  console.log(`Network: Core Testnet 2`);
-  console.log(`Contract Address: ${project.address}`);
-  console.log(`Election Name: ${electionName}`);
-  console.log(`Owner Address: ${deployer.address}`);
-  console.log(`Gas Used: ${project.deployTransaction.gasLimit?.toString() || 'N/A'}`);
-  console.log(`Block Number: ${project.deployTransaction.blockNumber || 'Pending'}`);
+  console.log(`Contract Name       : DecentralizedElection`);
+  console.log(`Network             : ${hre.network.name}`);
+  console.log(`Contract Address    : ${election.address}`);
+  console.log(`Admin Address       : ${deployer.address}`);
+  console.log(`Gas Limit Estimate  : ${election.deployTransaction.gasLimit?.toString() || 'N/A'}`);
+  console.log(`Block Number        : ${election.deployTransaction.blockNumber || 'Pending'}`);
   console.log("=".repeat(60));
-  
-  // Verify contract on Core Testnet 2 explorer (optional)
+
+  // Contract Verification (optional)
   if (hre.network.name === "core_testnet2") {
     console.log("\nStarting contract verification...");
     try {
       await hre.run("verify:verify", {
-        address: project.address,
-        constructorArguments: [electionName],
+        address: election.address,
+        constructorArguments: [], // No constructor args
       });
       console.log("✅ Contract verified successfully!");
     } catch (error) {
@@ -62,36 +58,34 @@ async function main() {
       console.log("You can manually verify the contract later.");
     }
   }
-  
-  // Save deployment info to a file
-  const fs = require('fs');
+
+  // Save deployment details
   const deploymentInfo = {
-    contractAddress: project.address,
-    contractName: "Project",
-    electionName: electionName,
+    contractAddress: election.address,
+    contractName: "DecentralizedElection",
     network: hre.network.name,
-    deployer: deployer.address,
-    transactionHash: project.deployTransaction.hash,
-    blockNumber: project.deployTransaction.blockNumber,
+    admin: deployer.address,
+    transactionHash: election.deployTransaction.hash,
+    blockNumber: election.deployTransaction.blockNumber,
     timestamp: new Date().toISOString()
   };
-  
+
   fs.writeFileSync(
-    './deployment-info.json', 
+    './deployment-info.json',
     JSON.stringify(deploymentInfo, null, 2)
   );
-  
+
   console.log("📝 Deployment info saved to deployment-info.json");
+
+  // Next Steps
   console.log("\nNext steps:");
-  console.log("1. Add candidates using addCandidate() function");
-  console.log("2. Register voters using registerVoter() function");
-  console.log("3. Start voting using startVoting() function");
-  console.log("4. Voters can cast votes using vote() function");
-  console.log("5. End voting using endVoting() function");
-  console.log("6. Check results using getWinner() function");
+  console.log("1. Add candidates using addCandidate(name)");
+  console.log("2. Start election using startElection()");
+  console.log("3. Allow voters to vote using vote(candidateId)");
+  console.log("4. End election using endElection()");
+  console.log("5. View results using getWinner(), getTopNCandidates(n), etc.");
 }
 
-// Run the deployment
 main()
   .then(() => process.exit(0))
   .catch((error) => {
