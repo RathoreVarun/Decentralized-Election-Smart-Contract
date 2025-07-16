@@ -239,32 +239,36 @@ contract DecentralizedElection {
         return leaders;
     }
 
-    // ----------- Voter Functions -----------
+        // ----------- Voter Functions -----------
 
-    function hasAddressVoted(address _voter) public view returns (bool) {
-        return hasVoted[_voter];
-    }
+// Check if a specific address has voted
+function hasAddressVoted(address voter) public view returns (bool) {
+    return hasVoted[voter];
+}
 
-    function hasSenderVoted() public view returns (bool) {
-        return hasVoted[msg.sender];
-    }
+// Check if the caller (msg.sender) has voted
+function hasSenderVoted() public view returns (bool) {
+    return hasVoted[msg.sender];
+}
 
-    function getVotingStatuses(address[] calldata _voters) external view returns (bool[] memory) {
-        uint len = _voters.length;
-        bool[] memory statuses = new bool[](len);
-        for (uint i = 0; i < len; i++) {
-            statuses[i] = hasVoted[_voters[i]];
-        }
-        return statuses;
+// Get voting status (true/false) for a list of addresses
+function getVotingStatuses(address[] calldata voters) external view returns (bool[] memory) {
+    bool[] memory statuses = new bool[](voters.length);
+    for (uint i = 0; i < voters.length; i++) {
+        statuses[i] = hasVoted[voters[i]];
     }
+    return statuses;
+}
 
-    function getAllVoters() public view returns (address[] memory) {
-        return voterList;
-    }
+// Return the list of all voters
+function getAllVoters() public view returns (address[] memory) {
+    return voterList;
+}
 
-    function isCandidateValid(uint _candidateId) public view returns (bool) {
-        return _candidateId != 0 && _candidateId <= candidatesCount;
-    }
+// Check if a candidate ID is valid (non-zero and exists)
+function isCandidateValid(uint candidateId) public view returns (bool) {
+    return candidateId > 0 && candidateId <= candidatesCount;
+}
 
     // ----------- Current status of the election  -----------
 
